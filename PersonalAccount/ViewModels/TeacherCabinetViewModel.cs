@@ -13,7 +13,9 @@ public class TeacherCabinetGroupViewModel : ViewModel
 
 public class TeacherCabinetViewModel : CabinetViewModel
 {
-    public Dictionary<TeacherCabinetDisciplineViewModel, List<TeacherCabinetGroupViewModel>> GroupsByDisciplines
+    public List<int> DisciplineIdsOrder { get; set; } = [];
+    public Dictionary<int, TeacherCabinetDisciplineViewModel> Disciplines { get; set; } = [];
+    public Dictionary<int, List<TeacherCabinetGroupViewModel>> GroupsByDisciplines
     {
         get;
         set;

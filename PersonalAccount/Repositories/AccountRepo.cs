@@ -17,5 +17,5 @@ public class AccountRepo(
         await GetByAsync(entity => entity.Email == email);
 
     public async Task<List<AccountModel>> GetAllByRoleAsync(AccountRoles role) =>
-        await GetAllByAsync(entity => entity.Role == role);
+        await GetAllByAsync(entity => (entity.Role & role) != 0);
 }

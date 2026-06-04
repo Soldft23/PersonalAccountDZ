@@ -31,19 +31,23 @@ public class TeacherCabinetController(
             PhotoUrl = teacherProfile.PhotoUrl?.ToString(),
             Email = accountEmail,
             IsEmailConfirmed = emailConfirmed,
-            GroupsByDisciplines = groupsByDisciplines.ToDictionary(groupsByDiscipline =>
-                    new TeacherCabinetDisciplineViewModel
+            DisciplineIdsOrder = groupsByDisciplines.Keys
+                .OrderBy(discipline => discipline.Name)
+                .Select(discipline => discipline.Id).ToList(),
+            Disciplines = groupsByDisciplines.Keys
+                .ToDictionary(discipline => discipline.Id, discipline => new TeacherCabinetDisciplineViewModel
+                {
+                    Name = discipline.Name,
+                }),
+            GroupsByDisciplines = groupsByDisciplines.ToDictionary(
+                groupsByDiscipline => groupsByDiscipline.Key.Id,
+                groupsByDiscipline => groupsByDiscipline.Value
+                    .Select(group => new TeacherCabinetGroupViewModel
                     {
-                        Name = groupsByDiscipline.Key.Name,
-                    },
-                groupsByDiscipline =>
-                    groupsByDiscipline.Value
-                        .Select(group => new TeacherCabinetGroupViewModel
-                        {
-                            Name = group.Name,
-                            ImageUrl = group.ImageUrl?.ToString(),
-                        })
-                        .ToList())
+                        Name = group.Name,
+                        ImageUrl = group.ImageUrl?.ToString(),
+                    })
+                    .ToList())
         });
     }
 }

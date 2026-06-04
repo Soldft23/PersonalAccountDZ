@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 using PersonalAccount.Constants;
 using PersonalAccount.Services.Cabinet;
 using PersonalAccount.Services.Smtp;
+using PersonalAccount.Types;
 using PersonalAccount.ViewModels;
 
 namespace PersonalAccount.Controllers;
@@ -10,17 +11,19 @@ namespace PersonalAccount.Controllers;
 [Authorize(Roles = AccountRoleConstants.Admin)]
 public class AdminPanelController(
     IAdminPanelService panelService,
+    ITeacherCabinetService teacherCabinetService,
     ISmtpClientService smtpClientService
 ) : Controller
 {
     [HttpGet]
     public async Task<IActionResult> Index()
     {
-        var accounts = (await panelService.GetAllStudentAccountsAsync())
+        var accounts = (await panelService.GetAllAccountsAsync(AccountRoles.Student | AccountRoles.Teacher))
             .ToDictionary(account => account.Id);
         var groups = (await panelService.GetAllGroupsAsync())
             .ToDictionary(group => group.Id);
         var studentProfiles = await panelService.GetAllStudentProfilesAsync();
+        var teacherProfiles = await panelService.GetAllTeacherProfilesAsync();
 
         return View(new AdminPanelViewModel
         {
@@ -30,6 +33,13 @@ public class AdminPanelController(
                 GroupName = groups[studentProfile.GroupId].Name,
                 PhotoUrl = studentProfile.PhotoUrl?.ToString(),
                 Email = accounts[studentProfile.AccountId].Email
+            }).ToList(),
+            Teachers = teacherProfiles.Select(teacherProfile => new AdminPanelTeacherViewModel
+            {
+                AccountId = teacherProfile.AccountId,
+                FullName = teacherProfile.FullName,
+                PhotoUrl = teacherProfile.PhotoUrl?.ToString(),
+                Email = accounts[teacherProfile.AccountId].Email
             }).ToList()
         });
     }
@@ -50,7 +60,7 @@ public class AdminPanelController(
             return View(model);
         }
 
-        var password = await panelService.RegisterStudentAccountWithGeneratedPasswordAsync(model.Email);
+        var password = await panelService.RegisterAccountWithGeneratedPasswordAsync(model.Email, AccountRoles.Student);
         await panelService.RegisterStudentProfileForEmailAsync(model.Email, model.FullName);
 
         await smtpClientService.SendEmailAsync(model.ContactEmail, "Данные для входа в систему", $"""
@@ -61,5 +71,87 @@ public class AdminPanelController(
              """);
 
         return RedirectToAction("Index");
+    }
+
+    [HttpGet]
+    public IActionResult RegisterTeacher() => View(new RegisterTeacherViewModel());
+
+    [HttpPost]
+    [ValidateAntiForgeryToken]
+    public async Task<IActionResult> RegisterTeacher(RegisterTeacherViewModel model)
+    {
+        if (!ModelState.IsValid) return View(model);
+
+        var isUnique = await panelService.CheckEmailUniqueAsync(model.Email);
+        if (!isUnique)
+        {
+            ModelState.AddModelError(string.Empty, $"Email {model.Email} is already taken.");
+            return View(model);
+        }
+
+        var password = await panelService.RegisterAccountWithGeneratedPasswordAsync(model.Email, AccountRoles.Teacher);
+        await panelService.RegisterTeacherProfileForEmailAsync(model.Email, model.FullName);
+
+        await smtpClientService.SendEmailAsync(model.ContactEmail, "Данные для входа в систему", $"""
+             <body>
+                 <p>{model.Email}</p>
+                 <p>{password}</p>
+             </body>
+             """);
+
+        return RedirectToAction("Index");
+    }
+
+    [HttpGet]
+    public async Task<IActionResult> EditTeacher(int teacherAccountId)
+    {
+        var teacherProfile = await teacherCabinetService.GetProfileAsync(teacherAccountId);
+        if (teacherProfile == null) return RedirectToAction("Error", "Home");
+        var groupsByDisciplines = await teacherCabinetService.GetGroupsByDisciplineAsync(teacherProfile.AccountId);
+        var groups = await panelService.GetAllGroupsAsync();
+
+        return View(new EditTeacherViewModel
+        {
+            AccountId = teacherAccountId,
+            DisciplineIdsOrder = groupsByDisciplines.Keys
+                .OrderBy(discipline => discipline.Name)
+                .Select(discipline => discipline.Id).ToList(),
+            Disciplines = groupsByDisciplines.Keys
+                .ToDictionary(discipline => discipline.Id, discipline => new EditTeacherDisciplineViewModel
+                {
+                    Id = discipline.Id,
+                    Name = discipline.Name,
+                }),
+            AllGroupOptions = groups.Select(group => new EditTeacherGroupOptionViewModel
+            {
+                Id = group.Id,
+                Name = group.Name,
+            }).Where(group => group.Id != GroupConstants.NoGroup.Id).ToList(),
+            GroupsByDisciplines = groupsByDisciplines.ToDictionary(
+                groupsByDiscipline => groupsByDiscipline.Key.Id,
+                groupsByDiscipline => groupsByDiscipline.Value
+                    .Select(group => new EditTeacherGroupViewModel
+                    {
+                        Id = group.Id,
+                        Name = group.Name,
+                        ImageUrl = group.ImageUrl?.ToString(),
+                    })
+                    .ToList())
+        });
+    }
+
+    [HttpPost]
+    [ValidateAntiForgeryToken]
+    public async Task<IActionResult> AddTeacherGroupDiscipline(int teacherAccountId, int disciplineId, int groupId)
+    {
+        await panelService.AddTeacherGroupDiscipline(teacherAccountId, disciplineId, groupId);
+        return RedirectToAction("EditTeacher", new { teacherAccountId });
+    }
+    [HttpPost]
+    [ValidateAntiForgeryToken]
+    public async Task<IActionResult> RemoveTeacherGroupDiscipline(int teacherAccountId, int disciplineId, int groupId)
+    {
+        await panelService.RemoveTeacherGroupDiscipline(teacherAccountId, disciplineId, groupId);
+        return RedirectToAction("EditTeacher", new { teacherAccountId });
     }
 }

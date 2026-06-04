@@ -13,4 +13,10 @@ public class TeacherGroupDisciplineRepo(
 {
     public async Task<List<TeacherGroupDisciplineModel>> GetAllByTeacherAccountIdAsync(int teacherAccountId)
         => await GetAllByAsync(entity => entity.TeacherAccountId == teacherAccountId);
+
+    public async Task RemoveByTeacherAccountIdAndGroupIdAndDisciplineIdAsync(int teacherAccountId, int disciplineId,
+        int groupId) =>
+        await RemoveByAsync(entity => entity.TeacherAccountId == teacherAccountId
+                                      && entity.DisciplineId == disciplineId
+                                      && entity.GroupId == groupId);
 }

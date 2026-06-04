@@ -12,4 +12,7 @@ public interface IRepo<TModel> where TModel : Model, new()
     Task<TModel?> GetByIdAsync(int id);
     Task<List<TModel>> GetAllAsync();
     Task<bool> AnyAsync();
+    
+    // DELETE
+    Task RemoveByIdAsync(int id);
 }

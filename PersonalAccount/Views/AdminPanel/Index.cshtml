@@ -4,28 +4,66 @@
     <header>
         <h1 class="text-start">Панель администратора</h1>
     </header>
-    <div class="container w-100 d-flex flex-wrap flex-fill gap-4">
-        @foreach (var student in Model.Students)
-        {
-            <div class="card" style="width: 200px">
-                <div class="card-img-top"
-                     style="background-image: url(@student.PhotoUrl); background-size: cover; height: 100px">
-
-                </div>
-                <header class="card-header">
-                    <h3 class="text-center">@student.FullName</h3>
-                </header>
-
-                <main class="card-body">
-                    <p class="text-start fw-bold">@student.GroupName</p>
-                    <div class="d-flex gap-2">
-                        <span class="text-start text-primary nav-link" href="@student.Email">@student.Email</span>
-                    </div>
-                </main>
+    <div class="d-flex flex-column gap-4 align-items-stretch">
+        <div class="d-grid gap-2" style="grid-template-columns: 4fr 1fr">
+            <div class="text-primary">
+                <h2>Студенты</h2>
             </div>
-        }
-        <form method="get" asp-action="RegisterStudent">
-            <button class="btn btn-outline-primary w-100 h-100" type="submit">Добавить студента</button>
-        </form>
+            <form method="get" asp-action="RegisterStudent">
+                <button class="btn btn-outline-primary w-100 h-100" type="submit">Добавить студента</button>
+            </form>
+        </div>
+        <div class="container w-100 d-flex flex-wrap flex-fill gap-4">
+            @foreach (var student in Model.Students)
+            {
+                <div class="card" style="width: 300px">
+                    <div class="card-img-top"
+                         style="background-image: url(@student.PhotoUrl); background-size: cover; height: 100px">
+
+                    </div>
+                    <header class="card-header">
+                        <h3 class="text-center">@student.FullName</h3>
+                    </header>
+
+                    <main class="card-body">
+                        <p class="text-start fw-bold">@student.GroupName</p>
+                        <span class="text-start text-primary nav-link" href="@student.Email">@student.Email</span>
+                    </main>
+                </div>
+            }
+        </div>
+    </div>
+
+    <div class="d-flex flex-column gap-4 align-items-stretch">
+        <div class="d-grid gap-2" style="grid-template-columns: 4fr 1fr">
+            <div class="text-primary">
+                <h2>Преподаватели</h2>
+            </div>
+            <form method="get" asp-action="RegisterTeacher">
+                <button class="btn btn-outline-primary w-100 h-100" type="submit">Добавить преподавателя</button>
+            </form>
+        </div>
+        <div class="container w-100 d-flex flex-wrap flex-fill gap-4">
+            @foreach (var teacher in Model.Teachers)
+            {
+                <div class="card" style="width: 300px">
+                    <div class="card-img-top"
+                         style="background-image: url(@teacher.PhotoUrl); background-size: cover; height: 100px">
+
+                    </div>
+                    <header class="card-header">
+                        <h3 class="text-center">@teacher.FullName</h3>
+                    </header>
+
+                    <main class="card-body">
+                        <span class="text-start text-primary nav-link" href="@teacher.Email">@teacher.Email</span>
+                    </main>
+                    <form class="card-footer" asp-action="EditTeacher" method="get">
+                        <input type="hidden" name="teacherAccountId" value="@teacher.AccountId"/>
+                        <button class="btn btn-outline-secondary"><i class="bi bi-pencil-square"></i></button>
+                    </form>
+                </div>
+            }
+        </div>
     </div>
 </div>
