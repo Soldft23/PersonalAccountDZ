@@ -8,7 +8,16 @@ public class AdminPanelStudentViewModel : ViewModel
     public string? PhotoUrl { get; set; }
 }
 
+public class AdminPanelTeacherViewModel : ViewModel
+{
+    public string FullName { get; set; } = string.Empty;
+    public string Email { get; set; } = string.Empty;
+    public string? PhotoUrl { get; set; }
+    public int AccountId { get; set; }
+}
+
 public class AdminPanelViewModel : ViewModel
 {
     public List<AdminPanelStudentViewModel> Students { get; set; } = [];
+    public List<AdminPanelTeacherViewModel> Teachers { get; set; } = [];
 }

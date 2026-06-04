@@ -1,17 +1,3 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿namespace PersonalAccount.ViewModels;
 
-namespace PersonalAccount.ViewModels;
-
-public class RegisterStudentViewModel
-{
-    [Required(ErrorMessage = "Name is required")]
-    public string FullName { get; set; } = string.Empty;
-
-    [Required(ErrorMessage = "Email is required")]
-    [EmailAddress]
-    public string Email { get; set; } = string.Empty;
-
-    [Required(ErrorMessage = "Contact Email is required")]
-    [EmailAddress]
-    public string ContactEmail { get; set; } = string.Empty;
-}
+public class RegisterStudentViewModel : RegisterViewModel;

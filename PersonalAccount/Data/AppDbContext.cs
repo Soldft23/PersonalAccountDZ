@@ -1,5 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using PersonalAccount.Data.Entities;
+using PersonalAccount.Types;
 using PersonalAccount.Utils;
 
 namespace PersonalAccount.Data;
@@ -90,6 +91,7 @@ public class AppDbContext(DbContextOptions<AppDbContext> options) : DbContext(op
 
             entity.Property(account => account.Role)
                 .HasColumnName("role")
+                .HasDefaultValue(AccountRoles.Student)
                 .IsRequired();
 
             entity.Property(account => account.Email)

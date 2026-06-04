@@ -39,6 +39,13 @@ public abstract class Repo<TEntity, TModel>(
 
     public async Task<bool> AnyAsync() => await Table.AnyAsync();
 
+    public async Task RemoveByIdAsync(int id)
+    {
+        var entity = await Table.FindAsync(id) ?? throw new KeyNotFoundException();
+        Table.Remove(entity);
+        await Ctx.SaveChangesAsync();
+    }
+
     protected async Task<TModel?> GetByAsync(Expression<Func<TEntity, bool>> predicate)
     {
         var entity = await Table
@@ -59,6 +66,13 @@ public abstract class Repo<TEntity, TModel>(
     {
         var entity = await Table.FindAsync(id) ?? throw new KeyNotFoundException();
         updateAction(entity);
+        await Ctx.SaveChangesAsync();
+    }
+
+    protected async Task RemoveByAsync(Expression<Func<TEntity, bool>> predicate)
+    {
+        var entity = await Table.FirstOrDefaultAsync(predicate) ?? throw new KeyNotFoundException();
+        Table.Remove(entity);
         await Ctx.SaveChangesAsync();
     }
 }
