@@ -1,0 +1,38 @@
+﻿@model PersonalAccount.Models.StudentEditViewModel
+
+<div class="container d-flex align-content-center justify-content-center mt-4">
+    <div class="card w-50">
+        <header class="card-header">
+            <h1 class="text-center">
+                Редактирование профиля
+            </h1>
+        </header>
+        <form class="card-body" method="post" asp-controller="Profile" asp-action="Edit">
+            <p class="text-center">Измените необходимые данные студента</p>
+            
+            <div class="alert alert-danger" asp-validation-summary="ModelOnly"></div>
+            
+            <div class="mb-3">
+                <label class="form-label" asp-for="FullName">ФИО</label>
+                <input class="form-control" asp-for="FullName" autocomplete="off"/>
+                <span class="text-danger small" asp-validation-for="FullName"></span>
+            </div>
+            
+            <div class="mb-3">
+                <label class="form-label" asp-for="GroupName">Группа</label>
+                <input class="form-control" asp-for="GroupName" autocomplete="off"/>
+                <span class="text-danger small" asp-validation-for="GroupName"></span>
+            </div>
+
+            <div class="mb-3">
+                <label class="form-label" asp-for="PhotoUrl">Ссылка на фото</label>
+                <input class="form-control" asp-for="PhotoUrl" autocomplete="off"/>
+                <span class="text-danger small" asp-validation-for="PhotoUrl"></span>
+            </div>
+            <div class="d-flex gap-2">
+                <button class="btn btn-primary flex-grow-1" type="submit">Сохранить</button>
+                <a class="btn btn-secondary" asp-action="Index">Отмена</a>
+            </div>
+        </form>
+    </div>
+</div>

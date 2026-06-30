@@ -54,7 +54,12 @@ builder.Services.AddSingleton<IMapper<ConfirmationTokenEntity, ConfirmationToken
 builder.Services.AddSingleton<IPasswordHasher<StudentAuthModel>, PasswordHasher<StudentAuthModel>>();
 
 var app = builder.Build();
-
+using (var scope = app.Services.CreateScope())
+{
+    var dbContext = scope.ServiceProvider.GetRequiredService<AppDbContext>();
+    // Эта строка автоматически применит все существующие миграции при старте приложения
+    dbContext.Database.Migrate(); 
+}
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {

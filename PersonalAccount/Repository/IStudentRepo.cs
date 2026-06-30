@@ -6,4 +6,5 @@ public interface IStudentRepo<T> where T : StudentModel
 {
     Task<T?> GetByEmailAsync(string email);
     Task<T?> GetByIdAsync(int id);
+    Task UpdateByIdAsync(int id, StudentModel student);
 }

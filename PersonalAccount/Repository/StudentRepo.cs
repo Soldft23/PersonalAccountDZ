@@ -24,4 +24,16 @@ public class StudentRepo<T>(AppDbContext ctx, IMapper<StudentEntity, T> mapper) 
         var entity = await Students.FindAsync(id);
         return entity == null ? null : mapper.ToModel(entity);
     }
+
+    public async Task UpdateByIdAsync(int id, StudentModel student)
+    {
+        var entity = await Students.FindAsync(id);
+        if (entity == null) return;
+
+        entity.FullName = student.FullName;
+        entity.GroupName = student.GroupName;
+        entity.PhotoUrl = student.PhotoUrl?.ToString();
+
+        await ctx.SaveChangesAsync();
+    }
 }
