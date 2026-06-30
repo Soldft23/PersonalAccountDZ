@@ -37,6 +37,7 @@ builder.Services.AddScoped<IStudentAuthService, StudentAuthService>();
 builder.Services.AddScoped<IStudentProfileService, StudentProfileService>();
 builder.Services.AddScoped<ISmtpClientService, SmtpClientService>();
 builder.Services.AddScoped<IConfirmationTokenService, ConfirmationTokenService>();
+builder.Services.AddScoped<IPasswordService, PasswordService>();
 if (builder.Environment.IsDevelopment())
     builder.Services.AddScoped<DbBootstrap>();
 

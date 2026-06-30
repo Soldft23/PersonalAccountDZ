@@ -36,4 +36,13 @@ public class StudentRepo<T>(AppDbContext ctx, IMapper<StudentEntity, T> mapper) 
 
         await ctx.SaveChangesAsync();
     }
+    public async Task UpdatePasswordHashAsync(int id, string passwordHash)
+    {
+        var entity = await Students.FindAsync(id);
+        if (entity == null) return;
+        
+        entity.PasswordHash = passwordHash;
+
+        await ctx.SaveChangesAsync();
+    }
 }

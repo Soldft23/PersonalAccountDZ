@@ -1,6 +1,7 @@
 ﻿namespace PersonalAccount.Services.Profile;
 
-public class IPasswordService
+public interface IPasswordService
 {
-    
+    Task<bool> ValidatePasswordAsync(int id, string password);
+    Task UpdatePasswordAsync(int id, string password);
 }
